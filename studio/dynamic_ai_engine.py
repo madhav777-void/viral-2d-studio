@@ -376,7 +376,8 @@ def run_dynamic_pipeline(job_id: str, prompt: str, style_key: str = "cinematic_3
     board_jpg = EXPORTS_DIR / f"{job_id}_board.jpg"
 
     # Burn subtitles and combine narration audio
-    sub_arg = f"ass='{sub_ass.resolve().as_posix().replace(':', r'\:')}'"
+    escaped_ass = sub_ass.resolve().as_posix().replace(':', r'\:')
+    sub_arg = f"ass='{escaped_ass}'"
     cmd_final = [
         "ffmpeg", "-y",
         "-i", str(raw_video),
