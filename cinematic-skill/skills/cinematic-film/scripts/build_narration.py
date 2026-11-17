@@ -31,7 +31,12 @@ def run(cmd):
 
 
 def duration(path):
-    return float(run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)]).strip())
+    res = run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)]).strip()
+    try:
+        val = float(res)
+        return val if val > 0.05 else 3.0
+    except Exception:
+        return 3.0
 
 
 def main():
@@ -50,7 +55,11 @@ def main():
         src = adir / "lines" / f"seg{seg['id']:02d}.wav"
         if not src.exists():
             sys.exit(f"missing line clip: {src} (run split_takes.py)")
-        run(["ffmpeg", "-y", "-v", "error", "-i", str(src), "-af", TRIM, "-ar", "48000", "-ac", "1", str(work / f"raw{seg['id']:02d}.wav")])
+        out_raw = work / f"raw{seg['id']:02d}.wav"
+        run(["ffmpeg", "-y", "-v", "error", "-i", str(src), "-af", TRIM, "-ar", "48000", "-ac", "1", str(out_raw)])
+        if not out_raw.exists() or out_raw.stat().st_size < 500:
+            import shutil
+            shutil.copyfile(src, out_raw)
 
     raw_speech = sum(duration(work / f"raw{s['id']:02d}.wav") for s in segments)
     fixed = a.lead + a.tail + sum(s["gap_after"] for s in segments[:-1])

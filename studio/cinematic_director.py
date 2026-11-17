@@ -324,12 +324,45 @@ def run_2d_cinematic_pipeline(job_id: str, prompt: str, look: str = "aesthetic_g
     (audio_dir / "segments.json").write_text(json.dumps({"segments": segments}, indent=2))
 
     # Step 3: Build Narration & Timing
-    log("Aligning voice timing & timeline...")
-    cmd_build_narr = [str(VENV_PYTHON), str(SCRIPTS_DIR / "build_narration.py"), "--project", str(proj_dir)]
-    res_narr = subprocess.run(cmd_build_narr, capture_output=True, text=True)
-    if res_narr.returncode != 0:
-        log(f"ERROR in narration alignment: {res_narr.stderr}")
-        raise RuntimeError(f"build_narration failed: {res_narr.stderr}")
+    if enable_voiceover:
+        log("Aligning voice timing & timeline...")
+        cmd_build_narr = [str(VENV_PYTHON), str(SCRIPTS_DIR / "build_narration.py"), "--project", str(proj_dir)]
+        res_narr = subprocess.run(cmd_build_narr, capture_output=True, text=True)
+        if res_narr.returncode != 0:
+            log(f"ERROR in narration alignment: {res_narr.stderr}")
+            raise RuntimeError(f"build_narration failed: {res_narr.stderr}")
+    else:
+        log("Aligning timeline for silent/SFX mode directly...")
+        cursor = 0.9
+        timeline = []
+        for s in segments:
+            s_wav = lines_dir / f"seg{s['id']:02d}.wav"
+            s_dur = float(len(wavfile.read(str(s_wav))[1])) / 48000.0
+            timeline.append({
+                "id": s["id"],
+                "scene": s["scene"],
+                "caption": s["caption"],
+                "vo": s["vo"],
+                "start": round(cursor, 3),
+                "end": round(cursor + s_dur, 3),
+                "duration": round(s_dur, 3)
+            })
+            cursor += s_dur + s["gap_after"]
+        total_time = round(cursor + 3.0, 3)
+        (audio_dir / "timing.json").write_text(json.dumps({
+            "total_duration": total_time,
+            "lead_in": 0.9,
+            "tail_out": 3.0,
+            "tempo": 1.0,
+            "segments": timeline
+        }, indent=2))
+        silent_m4a = audio_dir / "narration.m4a"
+        subprocess.run([
+            "ffmpeg", "-y", "-v", "error",
+            "-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono",
+            "-t", f"{total_time:.3f}",
+            "-c:a", "aac", "-b:a", "192k", str(silent_m4a)
+        ], check=True)
 
     # Step 4: Generate Scene Code (Skia 2D Canvas)
     log("Generating Skia 2D canvas code (Cards, Arrows, Counters, Stamps)...")
