@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faceless AI Video Studio - 3D Animation & Cinematic B-Roll</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#3b82f6">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    pre, code { font-family: 'JetBrains Mono', monospace; }
+    .glass {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- Header -->
+  <header class="glass sticky top-0 z-50 px-4 lg:px-8 py-3 flex items-center justify-between border-b border-slate-800">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+        <i class="fa-solid fa-wand-magic-sparkles text-lg text-white"></i>
+      </div>
+      <div>
+        <h1 class="font-extrabold text-base tracking-tight flex items-center gap-2">
+          Faceless AI Video Studio
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider">Cloud & Standalone APK Ready</span>
+        </h1>
+        <p class="text-[11px] text-slate-400">3D Cartoon Animations + Seedance 2.0 Cinematic B-Roll Director</p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+      <button onclick="switchTab('create')" id="tab-btn-create" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-blue-600 text-white transition-all shadow">
+        <i class="fa-solid fa-cube text-blue-200"></i> <span>3D Animation</span>
+      </button>
+      <button onclick="switchTab('seedance')" id="tab-btn-seedance" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+        <i class="fa-solid fa-clapperboard text-purple-400"></i> <span>Seedance B-Roll</span>
+      </button>
+      <button onclick="switchTab('keys')" id="tab-btn-keys" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+        <i class="fa-solid fa-key text-amber-400"></i> <span>API & Cloud</span>
+      </button>
+      <button onclick="switchTab('gallery')" id="tab-btn-gallery" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+        <i class="fa-solid fa-photo-film text-pink-400"></i> <span>Library</span>
+      </button>
+      <button onclick="switchTab('apk')" id="tab-btn-apk" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+        <i class="fa-solid fa-mobile-screen text-emerald-400"></i> <span>APK (Remote 100km)</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6">
+
+    <!-- TAB 1: 3D ANIMATION ENGINE -->
+    <section id="tab-create" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        
+        <!-- Left: Prompt, Style, Config (2 cols) -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="glass rounded-2xl p-5 space-y-4">
+            
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <i class="fa-solid fa-pen-nib text-blue-400"></i> 3D Video Topic / Prompt
+              </label>
+              <span class="text-xs text-slate-400">Prompt se script, voiceover aur 3D scene banega</span>
+            </div>
+
+            <textarea id="promptInput" rows="3" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl p-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="E.g., The crazy story of the man who cashed a $95,000 junk mail check and legally kept the money..."></textarea>
+            
+            <!-- Quick Chips -->
+            <div class="flex flex-wrap items-center gap-1.5 pt-1">
+              <span class="text-xs text-slate-500 font-medium mr-1">Trending Topics:</span>
+              <button onclick="setPrompt(this.innerText)" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all border border-slate-700/50">The $95,000 Junk Mail Check Heist</button>
+              <button onclick="setPrompt(this.innerText)" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all border border-slate-700/50">What Happens If You Swallow a Magnet?</button>
+              <button onclick="setPrompt(this.innerText)" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all border border-slate-700/50">Wild Survival Steps: Quick Sand Escape</button>
+            </div>
+
+            <!-- Aspect Ratio Selector (Widescreen vs Shorts) -->
+            <div class="pt-2 border-t border-slate-800 grid grid-cols-2 gap-3">
+              <label class="relative flex flex-col p-3 rounded-xl border border-blue-500/50 bg-blue-500/10 cursor-pointer transition-all aspect-option" data-aspect="16:9">
+                <input type="radio" name="aspect" value="16:9" checked class="hidden" onchange="updateAspectUI()">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-blue-400 flex items-center gap-1.5">
+                    <i class="fa-brands fa-youtube text-red-500 text-sm"></i> YouTube Widescreen (16:9 1080p)
+                  </span>
+                  <i class="fa-solid fa-circle-check text-blue-400 text-xs check-icon"></i>
+                </div>
+                <span class="text-[11px] text-slate-400">Horizontal format for full YouTube explainer videos</span>
+              </label>
+
+              <label class="relative flex flex-col p-3 rounded-xl border border-slate-800 bg-slate-900/60 cursor-pointer transition-all aspect-option" data-aspect="9:16">
+                <input type="radio" name="aspect" value="9:16" class="hidden" onchange="updateAspectUI()">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-mobile-screen text-pink-500 text-sm"></i> Shorts & Reels (9:16)
+                  </span>
+                  <i class="fa-regular fa-circle text-slate-600 text-xs check-icon"></i>
+                </div>
+                <span class="text-[11px] text-slate-400">Vertical mobile format for YouTube Shorts & Instagram</span>
+              </label>
+            </div>
+
+            <!-- Duration & Voice Settings -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div>
+                <label class="text-xs font-bold text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Target Length (Up to 5 min)</span>
+                  <span id="durVal" class="text-indigo-400 font-semibold">1 min</span>
+                </label>
+                <input id="durInput" type="range" min="30" max="300" step="15" value="60" oninput="updateDurationLabel(this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                <div class="flex justify-between text-[10px] text-slate-500 px-0.5 pt-1">
+                  <span>30s</span>
+                  <span>1m</span>
+                  <span>2m</span>
+                  <span>3m</span>
+                  <span>5m</span>
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-microphone-lines text-indigo-400"></i>
+                    <span>Voiceover Narration</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                    <input type="checkbox" id="enableVoiceoverCheckbox" checked onchange="toggleVoiceoverUI()" class="w-3.5 h-3.5 rounded bg-slate-800 text-indigo-600 accent-indigo-600 focus:ring-0">
+                    <span id="voiceStatusBadge" class="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">With AI Voice</span>
+                  </label>
+                </div>
+                <select id="voiceInput" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-opacity">
+                  <option value="am_michael">Michael (US Male - Steady Explainer) - Free Kokoro</option>
+                  <option value="af_heart">Heart (US Female - Warm & Clear) - Free Kokoro</option>
+                  <option value="am_puck">Puck (US Male - Lively & Fun) - Free Kokoro</option>
+                  <option value="af_bella">Bella (US Female - Bright & Upbeat) - Free Kokoro</option>
+                  <option value="am_fenrir">Fenrir (US Male - Deep & Cinematic) - Free Kokoro</option>
+                  <option value="bm_george">George (UK Male - Documentary Style) - Free Kokoro</option>
+                  <option value="elevenlabs_custom">Custom ElevenLabs Voice (From API Settings)</option>
+                </select>
+                <p id="withoutVoiceNote" class="text-[10px] text-amber-400 hidden pt-0.5 flex items-center gap-1">
+                  <i class="fa-solid fa-file-lines"></i> Voiceover OFF: Video will have Foley sound effects only + Written Script (.txt) will be generated!
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Video Style Cards With Distinct Preview Images -->
+          <div class="glass rounded-2xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                  <i class="fa-solid fa-palette text-blue-400"></i> Visual Style Selection
+                </label>
+                <p class="text-[11px] text-slate-400">Har style ka alag visual look aur preview image hai taaki aap dekh sakein kaisa video banega</p>
+              </div>
+              <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/30 shadow" id="selectedStyleName">✨ Aesthetic 2D (Vox / Linear)</span>
+            </div>
+
+            <!-- Styles Grid with Preview Images -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3" id="stylesGrid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Generate Action Button -->
+          <button id="generateBtn" onclick="startGeneration()" class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.99]">
+            <i class="fa-solid fa-film"></i>
+            <span>Generate 2D Explainer Video (1-Click)</span>
+          </button>
+        </div>
+
+        <!-- Right: Realtime Console & Progress (1 col) -->
+        <div class="space-y-4">
+          <div class="glass rounded-2xl p-5 flex flex-col h-[600px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                <i class="fa-solid fa-terminal text-blue-400"></i> Generation Console
+              </h3>
+              <span id="jobBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Idle</span>
+            </div>
+
+            <div class="py-3">
+              <div class="text-xs font-medium text-slate-300 mb-1 flex justify-between">
+                <span id="currentStepText">Engine ready</span>
+                <span id="currentStepPercent" class="text-blue-400 font-semibold">0%</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Log Terminal -->
+            <div id="logConsole" class="flex-1 bg-slate-950/90 rounded-xl p-3.5 custom-scrollbar overflow-y-auto text-xs text-slate-300 font-mono space-y-1.5 border border-slate-900">
+              <div class="text-slate-500">[System] 2D Motion Graphics & Explainer Engine Online.</div>
+              <div class="text-slate-500">[System] Google Skia 2D Canvas & Vector Renderer Active.</div>
+              <div class="text-slate-500">[System] Kokoro TTS & Procedural Foley Sound Design Loaded.</div>
+            </div>
+
+            <!-- Preview Card when done -->
+            <div id="previewCard" class="hidden pt-3 border-t border-slate-800 space-y-2">
+              <a id="downloadLink" href="#" download class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/20">
+                <i class="fa-solid fa-download"></i> <span>Download Finished MP4 Video</span>
+              </a>
+              <a id="downloadScriptLink" href="#" download class="w-full py-2 px-3 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 transition-all">
+                <i class="fa-solid fa-file-lines text-amber-400"></i> <span>Download Narration Script (.txt)</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: SEEDANCE 2.0 CINEMATIC B-ROLL STUDIO (DEDICATED SEPARATE PAGE) -->
+    <section id="tab-seedance" class="hidden space-y-6">
+      
+      <!-- Top Explanation Banner -->
+      <div class="glass rounded-2xl p-5 border-l-4 border-l-purple-500 bg-gradient-to-r from-purple-950/20 to-slate-900/60">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-lg font-bold border border-purple-500/30">
+            <i class="fa-solid fa-clapperboard"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              Seedance 2.0 & Cinematic B-Roll Director
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Advanced Faceless Prompt Engine</span>
+            </h2>
+            <p class="text-xs text-slate-400">
+              Higgsfield, Seedance 2.0, Sora, Kling, aur Runway ke liye high-retention faceless cinematic video director prompts generate karein (shallow depth of field, Kelvin lighting, motion laws, & 2s hook formulas).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        
+        <!-- Left: Form Controls (2 cols) -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="glass rounded-2xl p-5 space-y-4">
+            
+            <div>
+              <label class="text-xs font-bold text-slate-200 block mb-1.5 flex items-center gap-2">
+                <i class="fa-solid fa-lightbulb text-amber-400"></i> Topic / Story Subject
+              </label>
+              <input id="seedanceTopic" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="E.g., The 2008 Financial Crisis / Why Waking Up at 5 AM Rewires Your Brain / Silicon Valley Bank Collapse">
+            </div>
+
+            <!-- Visual Style & 2s Hook Table -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs font-bold text-slate-200 block mb-1">Visual Style Template</label>
+                <select id="seedanceStyle" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500">
+                  <option value="Cinematic B-Roll">1. Cinematic B-Roll (Documentary, History, Finance)</option>
+                  <option value="Motion Graphics Hybrid">2. Motion Graphics Hybrid (Tech, 3D Data Systems)</option>
+                  <option value="Ambient Aesthetic">3. Ambient Aesthetic (Lo-Fi, Rain, Productivity)</option>
+                  <option value="Documentary Reconstruction">4. Documentary Reconstruction (True Crime, CCTV, Noir)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-xs font-bold text-slate-200 block mb-1">2-Second Hook Pattern</label>
+                <select id="seedanceHook" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500">
+                  <option value="The Visual Metaphor">The Visual Metaphor (Chess piece falling, burning dollar)</option>
+                  <option value="The Data Reveal">The Data Reveal (Rapid spinning counter, shock number)</option>
+                  <option value="The Satisfying Loop">The Satisfying Loop (Liquid pouring, endless drift)</option>
+                  <option value="The Impossible Scene">The Impossible Scene (Hyperreal city, submerged room)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Platform & Lighting -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="text-xs font-bold text-slate-200 block mb-1">Target Platform</label>
+                <select id="seedancePlatform" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none">
+                  <option value="YouTube 16:9">YouTube Widescreen (16:9)</option>
+                  <option value="TikTok 9:16">TikTok Vertical (9:16)</option>
+                  <option value="Reels 9:16">Instagram Reels (9:16)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-xs font-bold text-slate-200 block mb-1">Sound Direction</label>
+                <select id="seedanceSound" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none">
+                  <option value="narration-first">Narration-First (Voiceover leads)</option>
+                  <option value="music-first">Music-First (Beat-sync / Lo-Fi)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-xs font-bold text-slate-200 block mb-1">Clip Duration</label>
+                <select id="seedanceDur" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none">
+                  <option value="8">8 Seconds (Standard Shot)</option>
+                  <option value="12">12 Seconds (Extended Scene)</option>
+                  <option value="5">5 Seconds (Fast Hook Cut)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <button onclick="generateSeedance()" id="seedanceBtn" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-sparkles"></i>
+              <span>Generate Seedance 2.0 Multi-Scene Director Prompt</span>
+            </button>
+          </div>
+
+          <!-- Result Card -->
+          <div id="seedanceResultContainer" class="hidden glass rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h3 class="text-sm font-bold text-white flex items-center gap-2" id="resTitle">Cinematic Director Output</h3>
+                <span class="text-[11px] text-purple-400 font-mono" id="resMeta"></span>
+              </div>
+              <button onclick="copySeedancePrompt()" class="text-xs px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg flex items-center gap-1.5 transition-all font-semibold shadow">
+                <i class="fa-solid fa-copy"></i> <span>Copy Full Prompt</span>
+              </button>
+            </div>
+
+            <!-- Hook Card -->
+            <div class="bg-purple-950/20 p-3.5 rounded-xl border border-purple-500/30 space-y-1">
+              <div class="text-[11px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-fish-fins"></i> 2-Second Hook Frame
+              </div>
+              <p class="text-xs text-slate-200 leading-relaxed font-mono" id="resHook"></p>
+            </div>
+
+            <!-- Scenes breakdown -->
+            <div class="space-y-2.5" id="resScenes"></div>
+
+            <!-- Copyable raw text block -->
+            <div class="space-y-1 pt-2">
+              <label class="text-[11px] font-bold text-slate-400 block uppercase">Raw Prompt (Ready for Seedance / Higgsfield / Sora / Runway)</label>
+              <textarea id="rawSeedanceText" rows="6" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 font-mono focus:outline-none"></textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Prompt Engineering Guide (1 col) -->
+        <div class="space-y-4">
+          <div class="glass rounded-2xl p-5 space-y-3.5 text-xs text-slate-300">
+            <h3 class="font-bold text-sm text-purple-400 flex items-center gap-2">
+              <i class="fa-solid fa-book-bookmark"></i> Three Laws of Faceless Content
+            </h3>
+            <ul class="space-y-2 text-slate-400">
+              <li class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                <strong class="text-slate-200 block mb-0.5">1. Never let the screen rest:</strong>
+                Every single second needs motion — camera push, drift, particles, or lighting shift.
+              </li>
+              <li class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                <strong class="text-slate-200 block mb-0.5">2. First frame is the thumbnail:</strong>
+                The opening 2s hook determines whether the audience stays or swipes.
+              </li>
+              <li class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                <strong class="text-slate-200 block mb-0.5">3. Lighting is character:</strong>
+                Without a human face, emotion comes from Kelvin temperatures (2700K warm vs 6500K twilight).
+              </li>
+            </ul>
+
+            <div class="pt-2 border-t border-slate-800">
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">Supported AI Video Engines:</span>
+              <div class="flex flex-wrap gap-1.5 text-[10px]">
+                <span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300">Seedance 2.0</span>
+                <span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300">Higgsfield AI</span>
+                <span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300">OpenAI Sora</span>
+                <span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300">Runway Gen-3</span>
+                <span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300">Kling AI</span>
+                <span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300">Luma Dream Machine</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 3: API KEYS & CLOUD SERVER SETTINGS -->
+    <section id="tab-keys" class="hidden space-y-6 max-w-3xl mx-auto">
+      <div class="glass rounded-2xl p-6 space-y-5">
+        <div class="border-b border-slate-800 pb-4">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up text-blue-400"></i> Cloud Server & Custom API Credits
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Chahe user 100 km door ho ya kisi doosre shehar mein — yahan Cloud Server URL aur personal API keys daalkar app bina laptop dependency ke 100% smoothly chalegi.
+          </p>
+        </div>
+
+        <!-- Cloud Server Endpoint -->
+        <div class="space-y-1.5 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-server text-emerald-400"></i> Remote Cloud Backend Host
+              <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">24/7 Hosting</span>
+            </label>
+            <span class="text-[11px] text-slate-400 font-mono">Current: <span id="currentHostDisplay" class="text-blue-400 font-bold">Same Host</span></span>
+          </div>
+          <input id="cloudHostInput" type="text" placeholder="https://your-space.hf.space ya http://localhost:8000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono">
+          <p class="text-[11px] text-slate-500">Agar aapne backend ko Hugging Face Spaces ya Render par deploy kiya hai, toh uska URL yahan daalein. Default khali chhodne par current host use hoga.</p>
+        </div>
+
+        <!-- Gemini API Key -->
+        <div class="space-y-1.5 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <i class="fa-brands fa-google text-blue-400"></i> Google Gemini API Key
+              <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Free Tier Available</span>
+            </label>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-xs text-blue-400 hover:underline flex items-center gap-1">
+              Get Free Key <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+          <input id="geminiKeyInput" type="password" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono">
+          <p class="text-[11px] text-slate-500">Fast, high-retention script & hook generation.</p>
+        </div>
+
+        <!-- OpenAI API Key -->
+        <div class="space-y-1.5 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-brain text-purple-400"></i> OpenAI API Key (Optional)
+            </label>
+            <a href="https://platform.openai.com/api-keys" target="_blank" class="text-xs text-blue-400 hover:underline flex items-center gap-1">
+              Get Key <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+          <input id="openaiKeyInput" type="password" placeholder="sk-proj-..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono">
+        </div>
+
+        <!-- ElevenLabs API Key -->
+        <div class="space-y-2.5 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-microphone-lines text-pink-400"></i> ElevenLabs Voice API Key (Optional)
+            </label>
+            <a href="https://elevenlabs.io/" target="_blank" class="text-xs text-blue-400 hover:underline flex items-center gap-1">
+              ElevenLabs <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+          <input id="elevenlabsKeyInput" type="password" placeholder="xi-api-key-..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">ElevenLabs Voice ID (Leave blank to use default)</label>
+            <input id="elevenVoiceIdInput" type="text" placeholder="21m00Tcm4TlvDq8ikWAM" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none font-mono">
+          </div>
+          <p class="text-[11px] text-slate-500">Agar ElevenLabs key nahi daalte toh $0 free local Kokoro AI voice chalti hai.</p>
+        </div>
+
+        <button onclick="saveApiKeys()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i> <span>Save Configuration Locally</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 4: VIDEO GALLERY -->
+    <section id="tab-gallery" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-folder-open text-blue-400"></i> Rendered Video Library
+          </h2>
+          <p class="text-xs text-slate-400">Bani hui sabhi 16:9 widescreen aur vertical shorts yahan available hain.</p>
+        </div>
+        <button onclick="loadGallery()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all">
+          <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+      </div>
+
+      <div id="galleryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+        <!-- Videos loaded dynamically -->
+      </div>
+    </section>
+
+    <!-- TAB 5: APK & REMOTE 100KM ACCESS ARCHITECTURE -->
+    <section id="tab-apk" class="hidden space-y-6 max-w-4xl mx-auto">
+      <div class="glass rounded-2xl p-6 space-y-6">
+        
+        <div class="border-b border-slate-800 pb-4">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-globe text-emerald-400"></i> 100 KM Door Se APK Kaise Chale (Zero Laptop Dependency)
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Pehle aapko apna laptop on rakhna padta tha kyunki server aapke laptop par chal raha tha. Yahan dekhein ki bina laptop ke standalone APK kaise banta hai.
+          </p>
+        </div>
+
+        <!-- 3 Simple Pillars -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          
+          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-2.5">
+            <div class="flex items-center gap-2 text-blue-400 font-bold text-sm">
+              <i class="fa-solid fa-cloud"></i> Step 1: 1-Click Free Cloud Backend
+            </div>
+            <p class="text-slate-300 leading-relaxed">
+              Humne aapke project mein ek complete <strong>Dockerfile</strong> bana diya hai.
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-slate-400">
+              <li><strong>Hugging Face Spaces (Free CPU/GPU)</strong>: Hugging Face par free account banakar "New Space" (Docker) select karein aur yeh folder upload karein.</li>
+              <li>Aapko ek permanent 24/7 online link mil jayega jaise: <br><code class="text-amber-400 bg-slate-950 px-2 py-0.5 rounded text-[11px]">https://your-name-studio.hf.space</code></li>
+              <li>Aapka laptop band bhi rahega toh bhi server cloud mein 24 ghante on rahega!</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-2.5">
+            <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+              <i class="fa-solid fa-mobile-screen"></i> Step 2: Standalone APK Install
+            </div>
+            <p class="text-slate-300 leading-relaxed">
+              Koi bhi aadmi chahe 100 km door baitha ho:
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-slate-400">
+              <li>Apne phone par APK download karega.</li>
+              <li>APK kholte hi Cloud Server se automatically connect ho jayegi.</li>
+              <li>User sirf apni free Gemini API Key daalega aur prompt likh kar video generate karega.</li>
+              <li>Aapka laptop on karne ki koi zaroorat nahi padegi!</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- APK Build Instructions -->
+        <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-3 text-xs">
+          <h4 class="font-bold text-sm text-white flex items-center gap-2">
+            <i class="fa-solid fa-file-code text-indigo-400"></i> Capacitor CLI se Standalone APK Build Karne Ka Tareeqa
+          </h4>
+          <p class="text-slate-400">
+            Aapke folder mein pre-configured Capacitor setup hai. Terminal mein sirf yeh commands run karke direct <code class="text-slate-200">.apk</code> file compile ho jati hai:
+          </p>
+          <pre class="bg-slate-950 p-3 rounded-lg text-slate-300 font-mono overflow-x-auto text-[11px] leading-relaxed">
+# 1. Install Capacitor
+npm install @capacitor/core @capacitor/cli @capacitor/android
+
+# 2. Add Android Platform
+npx cap add android
+
+# 3. Build APK
+npx cap build android
+          </pre>
+          <p class="text-emerald-400 font-medium">➔ Build complete hone ke baad <code class="text-slate-200">android/app/build/outputs/apk/release/app-release.apk</code> ready mil jayega jisko kisi ko bhi share kiya ja sakta hai!</p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const STYLES_LIST = [
+      { 
+        id: "aesthetic_grid", 
+        engine: "cinematic_2d",
+        name: "✨ Aesthetic 2D (Vox / Linear)", 
+        badge: "⭐ RECOMMENDED AESTHETIC",
+        img: "/images/styles/aesthetic-clean.png",
+        desc: "Modern minimal dot-grid canvas, floating pill badges, dual-ring bullet points, and clean typography." 
+      },
+      { 
+        id: "aesthetic_dark", 
+        engine: "cinematic_2d",
+        name: "🌙 Obsidian Dark (Kurzgesagt)", 
+        badge: "⭐ 2D DARK MODE",
+        img: "/images/styles/2d-slate.webp",
+        desc: "Sleek dark mode canvas with glowing accent cards, vibrant colored badges, and high-contrast counters." 
+      },
+      { 
+        id: "studio", 
+        engine: "cinematic_2d",
+        name: "📄 Studio Light Paper", 
+        badge: "⭐ 2D DOCUMENTARY",
+        img: "/images/styles/2d-studio.png",
+        desc: "Warm paper canvas, 2D floating cards, connecting route arrows, and smooth camera glides." 
+      },
+      { 
+        id: "blueprint", 
+        engine: "cinematic_2d",
+        name: "📐 Blueprint Drafting (Technical)", 
+        badge: "⭐ 2D TECHNICAL",
+        img: "/images/styles/2d-slate.webp",
+        desc: "Deep blue grid, technical schematics, cyan accent markers, and connected mechanism breakdowns." 
+      }
+    ];
+
+    let currentSelectedStyle = "aesthetic_grid";
+    let activeJobId = null;
+    let pollInterval = null;
+
+    function init() {
+      renderStylesGrid();
+      loadApiKeys();
+      loadGallery();
+    }
+
+    function renderStylesGrid() {
+      const grid = document.getElementById("stylesGrid");
+      grid.innerHTML = STYLES_LIST.map(s => `
+        <div onclick="selectStyle('${s.id}')" id="style-card-${s.id}" class="rounded-xl overflow-hidden border ${s.id === currentSelectedStyle ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/40' : 'border-slate-800 bg-slate-900/60'} hover:border-slate-700 cursor-pointer transition-all flex flex-col justify-between group shadow-sm">
+          <!-- Thumbnail Image -->
+          <div class="h-28 w-full bg-slate-950 relative overflow-hidden">
+            <img src="${s.img}" alt="${s.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.style.display='none'">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+            <span class="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-black/60 text-white font-semibold backdrop-blur-md border border-white/10">${s.badge}</span>
+            ${s.id === currentSelectedStyle ? '<span class="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] shadow"><i class="fa-solid fa-check"></i></span>' : ''}
+          </div>
+          <!-- Body -->
+          <div class="p-3 space-y-1">
+            <div class="text-xs font-bold text-slate-200 line-clamp-1 flex items-center justify-between">
+              <span>${s.name}</span>
+            </div>
+            <div class="text-[10px] text-slate-400 line-clamp-2 leading-tight">${s.desc}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function selectStyle(id) {
+      currentSelectedStyle = id;
+      const found = STYLES_LIST.find(s => s.id === id);
+      if (found) document.getElementById("selectedStyleName").innerText = found.name;
+      renderStylesGrid();
+    }
+
+    function setPrompt(text) {
+      document.getElementById("promptInput").value = text;
+    }
+
+    function updateAspectUI() {
+      const selected = document.querySelector('input[name="aspect"]:checked').value;
+      document.querySelectorAll('.aspect-option').forEach(el => {
+        const isMatch = el.getAttribute('data-aspect') === selected;
+        el.classList.toggle('border-blue-500/50', isMatch);
+        el.classList.toggle('bg-blue-500/10', isMatch);
+        el.classList.toggle('border-slate-800', !isMatch);
+        el.classList.toggle('bg-slate-900/60', !isMatch);
+        const icon = el.querySelector('.check-icon');
+        icon.className = isMatch ? 'fa-solid fa-circle-check text-blue-400 text-xs check-icon' : 'fa-regular fa-circle text-slate-600 text-xs check-icon';
+      });
+    }
+
+    function switchTab(tabId) {
+      ['create', 'seedance', 'keys', 'gallery', 'apk'].forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        if (el) el.classList.toggle('hidden', t !== tabId);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-blue-600 text-white transition-all shadow";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-all";
+          }
+        }
+      });
+      if (tabId === 'gallery') loadGallery();
+    }
+
+    function getBaseApiUrl() {
+      const customHost = localStorage.getItem("studio_cloud_host");
+      return customHost && customHost.startsWith("http") ? customHost.replace(/\/$/, "") : "";
+    }
+
+    function saveApiKeys() {
+      const cloudHost = document.getElementById("cloudHostInput").value.trim();
+      const gemini = document.getElementById("geminiKeyInput").value.trim();
+      const openai = document.getElementById("openaiKeyInput").value.trim();
+      const eleven = document.getElementById("elevenlabsKeyInput").value.trim();
+      const elevenVoice = document.getElementById("elevenVoiceIdInput").value.trim();
+
+      localStorage.setItem("studio_cloud_host", cloudHost);
+      localStorage.setItem("studio_gemini_key", gemini);
+      localStorage.setItem("studio_openai_key", openai);
+      localStorage.setItem("studio_elevenlabs_key", eleven);
+      localStorage.setItem("studio_eleven_voice_id", elevenVoice);
+
+      document.getElementById("currentHostDisplay").innerText = cloudHost || "Same Host";
+      alert("Settings and API keys saved locally to your device!");
+      switchTab('create');
+    }
+
+    function loadApiKeys() {
+      const savedHost = localStorage.getItem("studio_cloud_host") || "";
+      document.getElementById("cloudHostInput").value = savedHost;
+      document.getElementById("currentHostDisplay").innerText = savedHost || "Same Host";
+      document.getElementById("geminiKeyInput").value = localStorage.getItem("studio_gemini_key") || "";
+      document.getElementById("openaiKeyInput").value = localStorage.getItem("studio_openai_key") || "";
+      document.getElementById("elevenlabsKeyInput").value = localStorage.getItem("studio_elevenlabs_key") || "";
+      document.getElementById("elevenVoiceIdInput").value = localStorage.getItem("studio_eleven_voice_id") || "";
+    }
+
+    // ── 3D Animation Generation ──
+    async function startGeneration() {
+      const prompt = document.getElementById("promptInput").value.trim();
+      if (!prompt) {
+        alert("Please enter a video prompt or topic!");
+        return;
+      }
+
+      const aspect = document.querySelector('input[name="aspect"]:checked').value;
+      const duration = parseInt(document.getElementById("durInput").value);
+      const voice = document.getElementById("voiceInput").value;
+      const geminiKey = localStorage.getItem("studio_gemini_key") || "";
+      const openaiKey = localStorage.getItem("studio_openai_key") || "";
+      const elevenKey = localStorage.getItem("studio_elevenlabs_key") || "";
+      const elevenVoiceId = localStorage.getItem("studio_eleven_voice_id") || "";
+
+      const btn = document.getElementById("generateBtn");
+      btn.disabled = true;
+      btn.classList.add("opacity-50", "cursor-not-allowed");
+
+      document.getElementById("jobBadge").innerText = "Starting...";
+      document.getElementById("jobBadge").className = "text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30";
+      document.getElementById("previewCard").classList.add("hidden");
+      document.getElementById("logConsole").innerHTML = `<div class="text-blue-400 font-semibold">[Start] Initializing job for '${prompt}' (${aspect}, ${currentSelectedStyle})...</div>`;
+
+      try {
+        const styleObj = STYLES_LIST.find(s => s.id === currentSelectedStyle);
+        const engineMode = styleObj ? (styleObj.engine || "dynamic_ai") : "dynamic_ai";
+        const enableVoiceover = document.getElementById("enableVoiceoverCheckbox") ? document.getElementById("enableVoiceoverCheckbox").checked : true;
+
+        const baseUrl = getBaseApiUrl();
+        const resp = await fetch(`${baseUrl}/api/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt,
+            engine_mode: engineMode,
+            style: currentSelectedStyle,
+            aspect,
+            duration,
+            voice,
+            enable_voiceover: enableVoiceover,
+            gemini_key: geminiKey,
+            openai_key: openaiKey,
+            elevenlabs_key: elevenKey,
+            elevenlabs_voice_id: elevenVoiceId
+          })
+        });
+
+        const data = await resp.json();
+        if (data.status === "success") {
+          activeJobId = data.job_id;
+          startPolling(data.job_id);
+        } else {
+          alert("Failed to queue job: " + JSON.stringify(data));
+          btn.disabled = false;
+          btn.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+      } catch (err) {
+        alert("Error connecting to backend: " + err.message + "\nMake sure your server or Cloud URL is reachable.");
+        btn.disabled = false;
+        btn.classList.remove("opacity-50", "cursor-not-allowed");
+      }
+    }
+
+    function startPolling(jobId) {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(() => checkStatus(jobId), 1500);
+    }
+
+    async function checkStatus(jobId) {
+      try {
+        const baseUrl = getBaseApiUrl();
+        const resp = await fetch(`${baseUrl}/api/status/${jobId}`);
+        const data = await resp.json();
+
+        const logBox = document.getElementById("logConsole");
+        if (data.logs && data.logs.length) {
+          logBox.innerHTML = data.logs.map(l => `<div class="${l.startsWith('ERROR') ? 'text-red-400' : 'text-slate-300'}">${escapeHtml(l)}</div>`).join("");
+          logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        document.getElementById("currentStepText").innerText = data.current_step || "Processing...";
+
+        let pct = 10;
+        if (data.current_step && data.current_step.includes("Script")) pct = 25;
+        if (data.current_step && data.current_step.includes("Voice")) pct = 45;
+        if (data.current_step && data.current_step.includes("Whisper")) pct = 65;
+        if (data.current_step && data.current_step.includes("Foley")) pct = 75;
+        if (data.current_step && data.current_step.includes("rendering")) pct = 88;
+        if (data.status === "completed") pct = 100;
+
+        document.getElementById("progressBar").style.width = pct + "%";
+        document.getElementById("currentStepPercent").innerText = pct + "%";
+
+        if (data.status === "completed") {
+          clearInterval(pollInterval);
+          document.getElementById("jobBadge").innerText = "Completed";
+          document.getElementById("jobBadge").className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+          
+          const btn = document.getElementById("generateBtn");
+          btn.disabled = false;
+          btn.classList.remove("opacity-50", "cursor-not-allowed");
+
+          document.getElementById("previewCard").classList.remove("hidden");
+          document.getElementById("downloadLink").href = `${baseUrl}/api/video/${jobId}`;
+          const sLink = document.getElementById("downloadScriptLink");
+          if (sLink) sLink.href = `${baseUrl}/api/script/${jobId}`;
+          loadGallery();
+        } else if (data.status === "failed") {
+          clearInterval(pollInterval);
+          document.getElementById("jobBadge").innerText = "Failed";
+          document.getElementById("jobBadge").className = "text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30";
+          
+          const btn = document.getElementById("generateBtn");
+          btn.disabled = false;
+          btn.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }
+
+    // ── Seedance 2.0 Director Prompt Generation ──
+    async function generateSeedance() {
+      const topic = document.getElementById("seedanceTopic").value.trim();
+      if (!topic) {
+        alert("Please enter a story topic or subject!");
+        return;
+      }
+
+      const style = document.getElementById("seedanceStyle").value;
+      const hook_type = document.getElementById("seedanceHook").value;
+      const platform = document.getElementById("seedancePlatform").value;
+      const sound_priority = document.getElementById("seedanceSound").value;
+      const duration = parseInt(document.getElementById("seedanceDur").value);
+
+      const geminiKey = localStorage.getItem("studio_gemini_key") || "";
+      const openaiKey = localStorage.getItem("studio_openai_key") || "";
+
+      const btn = document.getElementById("seedanceBtn");
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Directing Seedance 2.0 Scenes...`;
+
+      try {
+        const baseUrl = getBaseApiUrl();
+        const resp = await fetch(`${baseUrl}/api/seedance/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic,
+            style,
+            hook_type,
+            platform,
+            duration,
+            sound_priority,
+            gemini_key: geminiKey,
+            openai_key: openaiKey
+          })
+        });
+
+        const res = await resp.json();
+        if (res.status === "success" && res.data) {
+          const d = res.data;
+          document.getElementById("seedanceResultContainer").classList.remove("hidden");
+          document.getElementById("resTitle").innerText = d.title || `Seedance 2.0: ${topic}`;
+          document.getElementById("resMeta").innerText = `${d.platform} · ${d.style} · ${d.hook_type}`;
+          document.getElementById("resHook").innerText = d.hook_frame || "";
+
+          const scenesBox = document.getElementById("resScenes");
+          scenesBox.innerHTML = (d.scenes || []).map((s, idx) => `
+            <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-200">Scene ${idx+1}: ${escapeHtml(s.scene_name || '')} (${s.timecode || ''})</span>
+                <span class="text-[10px] text-purple-400 font-mono">${escapeHtml(s.lighting || '')}</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(s.prompt || '')}</p>
+              <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-400 pt-1 border-t border-slate-800/60 font-mono">
+                <div><strong class="text-slate-300">Camera:</strong> ${escapeHtml(s.camera || '')}</div>
+                <div><strong class="text-slate-300">Sound:</strong> ${escapeHtml(s.sound || '')}</div>
+              </div>
+            </div>
+          `).join("");
+
+          document.getElementById("rawSeedanceText").value = d.formatted_prompt || "";
+          document.getElementById("seedanceResultContainer").scrollIntoView({ behavior: 'smooth' });
+        } else {
+          alert("Error generating Seedance prompt: " + JSON.stringify(res));
+        }
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-sparkles"></i> <span>Generate Seedance 2.0 Multi-Scene Director Prompt</span>`;
+      }
+    }
+
+    function copySeedancePrompt() {
+      const txt = document.getElementById("rawSeedanceText").value;
+      if (!txt) return;
+      navigator.clipboard.writeText(txt).then(() => {
+        alert("Seedance 2.0 full director prompt copied to clipboard! Ready to paste into Higgsfield, Sora, or Runway.");
+      });
+    }
+
+    // ── Video Gallery ──
+    async function loadGallery() {
+      try {
+        const baseUrl = getBaseApiUrl();
+        const resp = await fetch(`${baseUrl}/api/videos`);
+        const data = await resp.json();
+        const grid = document.getElementById("galleryGrid");
+
+        if (!data.videos || data.videos.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-full py-12 text-center text-slate-500 text-xs">
+              <i class="fa-solid fa-film text-3xl mb-2 block opacity-30"></i>
+              No videos rendered yet. Create your first video!
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = data.videos.map(v => `
+          <div class="glass rounded-xl overflow-hidden border border-slate-800 hover:border-slate-700 flex flex-col justify-between transition-all group shadow-lg">
+            <div class="aspect-video bg-black relative">
+              <video src="${baseUrl}${v.video_url}" controls class="w-full h-full object-contain"></video>
+            </div>
+            <div class="p-3.5 space-y-2">
+              <div class="text-xs font-bold text-slate-100 line-clamp-1">${escapeHtml(v.title || v.job_id)}</div>
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] text-slate-400 font-mono">${v.job_id}</span>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="deleteVideo('${v.job_id}')" title="Delete video" class="text-xs p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-lg transition-all border border-red-500/20" title="Delete">
+                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                  </button>
+                  ${v.script_url ? `
+                  <a href="${baseUrl}${v.script_url}" download title="Download Written Script (.txt)" class="text-xs px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition-all flex items-center gap-1 font-semibold">
+                    <i class="fa-solid fa-file-lines text-[10px] text-amber-400"></i> Script .txt
+                  </a>` : ''}
+                  <a href="${baseUrl}${v.video_url}" download class="text-xs px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all flex items-center gap-1 font-semibold shadow">
+                    <i class="fa-solid fa-download text-[10px]"></i> MP4
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function deleteVideo(jobId) {
+      if (!confirm(`Are you sure you want to delete this video (${jobId}) from the library?`)) {
+        return;
+      }
+      try {
+        const baseUrl = getBaseApiUrl();
+        const resp = await fetch(`${baseUrl}/api/video/${jobId}/delete`, { method: "POST" });
+        const res = await resp.json();
+        if (res.status === "success") {
+          loadGallery();
+        } else {
+          alert("Could not delete video: " + (res.detail || JSON.stringify(res)));
+        }
+      } catch (err) {
+        alert("Delete failed: " + err.message);
+      }
+    }
+
+    function toggleVoiceoverUI() {
+      const cb = document.getElementById("enableVoiceoverCheckbox");
+      const badge = document.getElementById("voiceStatusBadge");
+      const note = document.getElementById("withoutVoiceNote");
+      const voiceSelect = document.getElementById("voiceInput");
+      if (cb.checked) {
+        badge.innerText = "With AI Voice";
+        badge.className = "text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20";
+        note.classList.add("hidden");
+        voiceSelect.disabled = false;
+        voiceSelect.classList.remove("opacity-40");
+      } else {
+        badge.innerText = "Muted (Script .txt Only)";
+        badge.className = "text-[10px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20";
+        note.classList.remove("hidden");
+        voiceSelect.disabled = true;
+        voiceSelect.classList.add("opacity-40");
+      }
+    }
+
+    function updateDurationLabel(val) {
+      val = parseInt(val);
+      let txt = val + "s";
+      if (val >= 60) {
+        const mins = Math.floor(val / 60);
+        const secs = val % 60;
+        txt = secs > 0 ? `${mins}m ${secs}s` : `${mins} min`;
+        if (val === 300) txt = "5 min (Deep Explainer)";
+      }
+      document.getElementById("durVal").innerText = txt;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

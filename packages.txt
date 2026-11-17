@@ -1,0 +1,7 @@
+ffmpeg
+fonts-dejavu-core
+fontconfig
+libfontconfig1
+libfreetype6
+libgl1
+libglib2.0-0

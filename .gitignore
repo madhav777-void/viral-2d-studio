@@ -1,0 +1,29 @@
+# Environment & Virtualenv
+.omni-shorts/venv/
+.omni-shorts/kokoro/
+.venv/
+venv/
+env/
+
+# Cache & Build
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# Large media & project temp outputs
+studio/projects/
+studio/exports/*.mp4
+studio/exports/*.wav
+studio/exports/*.m4a
+audio/
+out/
+tmp/
+*.mp4
+*.wav
+cloudflared.exe
+test_*.png
+
+# OS files
+.DS_Store
+Thumbs.db

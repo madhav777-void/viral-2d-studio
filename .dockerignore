@@ -1,0 +1,8 @@
+.omni-shorts/venv/
+.omni-shorts/kokoro/
+studio/projects/
+studio/exports/*.mp4
+__pycache__/
+*.pyc
+.git
+node_modules/
