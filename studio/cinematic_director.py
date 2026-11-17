@@ -29,7 +29,8 @@ elif (BASE_DIR / ".omni-shorts" / "venv" / "bin" / "python").exists():
 else:
     VENV_PYTHON = Path(sys.executable)
 
-KOKORO_DIR = BASE_DIR / ".omni-shorts" / "kokoro"
+omni_env = os.environ.get("OMNI_HOME")
+KOKORO_DIR = Path(omni_env) / "kokoro" if omni_env else (BASE_DIR / ".omni-shorts" / "kokoro")
 
 # Setup sys.path
 sys.path.insert(0, str(SCRIPTS_DIR))
@@ -273,37 +274,62 @@ def run_2d_cinematic_pipeline(job_id: str, prompt: str, look: str = "aesthetic_g
     (proj_dir / "photos.json").write_text(json.dumps({"grade": "natural", "photos": []}))
     (proj_dir / "map.json").write_text(json.dumps({}))
 
-    # Step 2: Kokoro TTS
-    log("Synthesizing studio voiceover with Kokoro TTS...")
-    import kokoro_onnx
-    kokoro = kokoro_onnx.Kokoro(str(KOKORO_DIR / "kokoro-v1.0.onnx"), str(KOKORO_DIR / "voices-v1.0.bin"))
-    
+    # Step 2: Voiceover / Timing Generation
     segments = []
-    for st in steps:
-        lid = st["id"]
-        spoken = st["spoken"]
-        samples, sr = kokoro.create(spoken, voice=voice if voice != "elevenlabs_custom" else "am_michael", speed=1.05)
-        out_wav = lines_dir / f"seg{lid:02d}.wav"
+    if enable_voiceover:
+        log(f"Synthesizing studio voiceover with Kokoro TTS ({len(steps)} scenes)...")
+        import kokoro_onnx
+        kokoro_model = KOKORO_DIR / "kokoro-v1.0.onnx"
+        kokoro_voices = KOKORO_DIR / "voices-v1.0.bin"
+        kokoro = kokoro_onnx.Kokoro(str(kokoro_model), str(kokoro_voices))
         
-        # Resample to 48000 Hz int16
-        samples_48k = scipy.signal.resample(samples, int(len(samples) * 48000 / sr))
-        samples_int16 = (samples_48k * 32767).clip(-32768, 32767).astype(np.int16)
-        wavfile.write(str(out_wav), 48000, samples_int16)
+        for idx, st in enumerate(steps):
+            lid = st["id"]
+            spoken = st["spoken"]
+            log(f"🎙️ Voicing Scene {idx+1}/{len(steps)}: '{spoken[:35]}...'")
+            samples, sr = kokoro.create(spoken, voice=voice if voice != "elevenlabs_custom" else "am_michael", speed=1.05)
+            out_wav = lines_dir / f"seg{lid:02d}.wav"
+            
+            # Resample to 48000 Hz int16
+            samples_48k = scipy.signal.resample(samples, int(len(samples) * 48000 / sr))
+            samples_int16 = (samples_48k * 32767).clip(-32768, 32767).astype(np.int16)
+            wavfile.write(str(out_wav), 48000, samples_int16)
 
-        segments.append({
-            "id": lid,
-            "scene": f"T{lid:02d}",
-            "caption": spoken,
-            "vo": spoken,
-            "gap_after": 0.8 if lid == len(steps) else 0.5
-        })
+            segments.append({
+                "id": lid,
+                "scene": f"T{lid:02d}",
+                "caption": spoken,
+                "vo": spoken,
+                "gap_after": 0.8 if lid == len(steps) else 0.5
+            })
+    else:
+        log("🎙️ Voiceover disabled: Generating timing track instantly (0.1s)...")
+        for idx, st in enumerate(steps):
+            lid = st["id"]
+            spoken = st["spoken"]
+            word_count = len(spoken.split())
+            dur_s = max(2.5, word_count * 0.38 + 0.6)
+            out_wav = lines_dir / f"seg{lid:02d}.wav"
+            silent_samples = np.zeros(int(dur_s * 48000), dtype=np.int16)
+            wavfile.write(str(out_wav), 48000, silent_samples)
+
+            segments.append({
+                "id": lid,
+                "scene": f"T{lid:02d}",
+                "caption": spoken,
+                "vo": spoken,
+                "gap_after": 0.8 if lid == len(steps) else 0.5
+            })
 
     (audio_dir / "segments.json").write_text(json.dumps({"segments": segments}, indent=2))
 
     # Step 3: Build Narration & Timing
     log("Aligning voice timing & timeline...")
     cmd_build_narr = [str(VENV_PYTHON), str(SCRIPTS_DIR / "build_narration.py"), "--project", str(proj_dir)]
-    subprocess.run(cmd_build_narr, check=True, capture_output=True)
+    res_narr = subprocess.run(cmd_build_narr, capture_output=True, text=True)
+    if res_narr.returncode != 0:
+        log(f"ERROR in narration alignment: {res_narr.stderr}")
+        raise RuntimeError(f"build_narration failed: {res_narr.stderr}")
 
     # Step 4: Generate Scene Code (Skia 2D Canvas)
     log("Generating Skia 2D canvas code (Cards, Arrows, Counters, Stamps)...")
@@ -313,7 +339,10 @@ def run_2d_cinematic_pipeline(job_id: str, prompt: str, look: str = "aesthetic_g
     # Step 5: Prep Textures & Assets
     log("Preparing procedural board textures...")
     cmd_prep = [str(VENV_PYTHON), str(SCRIPTS_DIR / "prep_assets.py"), "--project", str(proj_dir)]
-    subprocess.run(cmd_prep, check=True, capture_output=True)
+    res_prep = subprocess.run(cmd_prep, capture_output=True, text=True)
+    if res_prep.returncode != 0:
+        log(f"ERROR in prep_assets: {res_prep.stderr}")
+        raise RuntimeError(f"prep_assets failed: {res_prep.stderr}")
 
     # Step 6: Render Skia Frames
     log("Rendering 2D motion graphics frame-by-frame with Google Skia...")
