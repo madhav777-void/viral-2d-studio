@@ -44,4 +44,4 @@ ENV APP_DIR=/app
 ENV PYTHONPATH=/app/studio:/app/cinematic-skill/skills/cinematic-film/scripts
 
 # Dynamically binds to $PORT (Render.com uses 10000, Hugging Face uses 7860, default 8000)
-CMD sh -c "python -m uvicorn server:app --app-dir studio --host 0.0.0.0 --port \${PORT:-8000}"
+CMD python -m uvicorn server:app --app-dir studio --host 0.0.0.0 --port ${PORT:-8000}
