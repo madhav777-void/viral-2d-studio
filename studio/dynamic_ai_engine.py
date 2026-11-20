@@ -25,6 +25,8 @@ OMNI_HOME = BASE_DIR.parent / ".omni-shorts"
 SKILL_DIR = Path("C:/Users/Madhav Sharma/.gemini/config/skills/omni-shorts")
 
 STYLE_PROMPT_PREFIXES = {
+    "aesthetic_grid": "2D clean flat vector illustration, Vox documentary explainer style, minimalist aesthetic, sharp clean lines, rich colors: ",
+    "2d_story": "2D modern flat vector character illustration, YouTube finance explainer animation style, clean outlines, vibrant colors: ",
     "cinematic_3d": "Cinematic 3D animation, Unreal Engine 5 render, Pixar style, highly detailed 3D scene, dramatic cinematic volumetric lighting, masterwork, 8k: ",
     "photorealistic": "Photorealistic cinematic still, 35mm lens, shot on Arri Alexa, movie scene, dramatic lighting, depth of field, 8k: ",
     "dark_noir": "Dark noir crime documentary style, moody shadows, single sharp light source, atmospheric, tense, high detail: ",
@@ -84,40 +86,131 @@ Foley cues can be: "whoosh", "ding", "pop", "plop", "thud", "slam", "cash".
     raw_json = data["candidates"][0]["content"]["parts"][0]["text"]
     return json.loads(raw_json)
 
+def generate_free_ai_scenes(prompt: str, style_key: str, aspect: str, target_seconds: int):
+    import urllib.request
+    import urllib.parse
+    import re
+    num_scenes = max(4, min(12, int(target_seconds / 5.0)))
+    sys_prompt = f"""You are an elite viral 2D documentary explainer director (Vox, Johnny Harris, Kurzgesagt).
+Topic: "{prompt}"
+Target Duration: ~{target_seconds} seconds ({num_scenes} scenes).
+Format: {aspect}
+
+Write exactly {num_scenes} factual, engaging, story-matched scenes strictly about "{prompt}".
+Every scene must have a dedicated `visual_prompt` describing specific characters, actions, settings, and props in 2D clean flat vector explainer style.
+
+Return STRICT JSON ONLY:
+{{
+  "title": "Short Catchy Title",
+  "scenes": [
+    {{
+      "i": 0,
+      "text": "The sentence spoken out loud specifically about {prompt}.",
+      "visual_prompt": "2D modern flat vector illustration showing specific subject and action, 16:9",
+      "caps": "2-3 BOLD HIGHLIGHTS",
+      "motion": "zoom_in",
+      "foley": "whoosh"
+    }}
+  ]
+}}
+Motions can be: "zoom_in", "zoom_out", "pan_left", "pan_right".
+"""
+    url = "https://text.pollinations.ai/" + urllib.parse.quote(sys_prompt) + "?json=true"
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=25) as resp:
+        text = resp.read().decode("utf-8")
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if match:
+            data = json.loads(match.group(0))
+            if "scenes" in data and len(data["scenes"]) >= 2:
+                return data
+    raise RuntimeError("Failed to parse free AI scenes")
+
+def parse_user_custom_ai_scenes(prompt: str):
+    import re
+    lines = prompt.strip().split("\n")
+    scenes = []
+    current_scene = {}
+    for line in lines:
+        line_s = line.strip()
+        if not line_s:
+            continue
+        clip_match = re.match(r'^(?:CLIP|Clip|SCENE|Scene|\#)\s*(\d+)|\b(\d+)\.\s+', line_s)
+        if clip_match:
+            if current_scene and "text" in current_scene:
+                scenes.append(current_scene)
+            current_scene = {"i": len(scenes), "text": "", "visual_prompt": "", "caps": "KEY MOMENT", "motion": "zoom_in", "foley": "whoosh"}
+        elif "voice-over:" in line_s.lower() or "voiceover:" in line_s.lower() or "vo:" in line_s.lower():
+            text = re.sub(r'^(?:voice-over|voiceover|vo)\s*:\s*', '', line_s, flags=re.I).strip()
+            if current_scene:
+                current_scene["text"] = text
+        elif "image prompt" in line_s.lower() or "visual:" in line_s.lower() or "visuals:" in line_s.lower():
+            vis = re.sub(r'^\[?(?:image prompt|visual|visuals)\]?\s*:\s*', '', line_s, flags=re.I).strip()
+            if current_scene:
+                current_scene["visual_prompt"] = vis
+        elif "animation prompt" in line_s.lower() or "motion:" in line_s.lower():
+            m_text = line_s.lower()
+            if "pan left" in m_text or "pan_left" in m_text:
+                current_scene["motion"] = "pan_left"
+            elif "pan right" in m_text or "pan_right" in m_text:
+                current_scene["motion"] = "pan_right"
+            elif "zoom out" in m_text or "zoom_out" in m_text:
+                current_scene["motion"] = "zoom_out"
+            else:
+                current_scene["motion"] = "zoom_in"
+        elif current_scene:
+            if not current_scene.get("text"):
+                current_scene["text"] = line_s
+            elif not current_scene.get("visual_prompt"):
+                current_scene["visual_prompt"] = line_s
+
+    if current_scene and "text" in current_scene:
+        scenes.append(current_scene)
+
+    if len(scenes) >= 2:
+        title = "EXPLAINER STORY"
+        for idx, sc in enumerate(scenes):
+            sc["i"] = idx
+            if not sc.get("visual_prompt"):
+                sc["visual_prompt"] = f"2D flat vector explainer illustration representing {sc['text'][:40]}, 16:9"
+        return {"title": title, "scenes": scenes}
+    return None
+
 def fallback_scenes(prompt: str, style_key: str, target_seconds: int):
-    # Rule-based fallback if API is not available
+    words = [w for w in prompt.replace("?", "").replace("!", "").split() if len(w) > 2]
+    topic = " ".join(words[:4]).title() if words else "This Concept"
     return {
-        "title": prompt[:30],
+        "title": topic[:30],
         "scenes": [
             {
                 "i": 0,
-                "text": f"What if the truth about {prompt} was completely hidden until right now?",
-                "visual_prompt": f"Dramatic reveal of {prompt}, mysterious lighting, cinematic fog, epic camera angle",
-                "caps": "THE HIDDEN TRUTH",
+                "text": f"Have you ever wondered what actually makes {topic} work the way it does?",
+                "visual_prompt": f"2D flat vector illustration introducing {topic}, clear modern infographic elements, clean lines",
+                "caps": "THE CORE QUESTION",
                 "motion": "zoom_in",
                 "foley": "whoosh"
             },
             {
                 "i": 1,
-                "text": "Most people believe it works one way, but the reality is shocking.",
-                "visual_prompt": f"Close-up intense investigation of {prompt}, glowing blueprint elements, dramatic focus",
-                "caps": "SHOCKING REALITY",
+                "text": f"Behind the scenes, the mechanics of {words[0] if words else 'the system'} operate under precise rules.",
+                "visual_prompt": f"2D flat vector breakdown dissecting the inner system of {topic}, flowchart arrows and metrics",
+                "caps": "INNER MECHANICS",
                 "motion": "pan_left",
                 "foley": "ding"
             },
             {
                 "i": 2,
-                "text": "When you examine the actual mechanics, one fatal flaw appears.",
-                "visual_prompt": f"Macro shot dissecting the exact problem of {prompt}, intense warning signs",
-                "caps": "FATAL FLAW",
+                "text": f"When you compare the numbers and real-world outcomes, the actual truth becomes unmistakable.",
+                "visual_prompt": f"2D flat vector split-screen comparison revealing data and outcomes of {topic}, vibrant modern style",
+                "caps": "PROVEN RESULTS",
                 "motion": "zoom_out",
                 "foley": "pop"
             },
             {
                 "i": 3,
-                "text": "And once you see how it works, you can never unsee it.",
-                "visual_prompt": f"Mind-bending visual metaphor representing {prompt}, glorious cinematic resolution",
-                "caps": "NEVER UNSEE IT",
+                "text": f"And that is why understanding {topic} completely changes how people navigate this field.",
+                "visual_prompt": f"2D flat vector inspiring conclusion shot for {topic}, triumphant modern graphics, 16:9",
+                "caps": "FINAL TAKEAWAY",
                 "motion": "pan_right",
                 "foley": "slam"
             }
@@ -274,17 +367,35 @@ def run_dynamic_pipeline(job_id: str, prompt: str, style_key: str = "cinematic_3
     log(f"Starting AI Dynamic Story-Match Engine for '{prompt}' ({aspect}, {style_key})...")
 
     # Step 1: Generate Script & Story-Matched Scene Prompts
-    log("Crafting scene-by-scene storyboard with Gemini AI...")
+    log("Crafting scene-by-scene storyboard...")
     story_data = None
-    if gemini_key:
+
+    # Priority 1: Check if user entered a custom structured script (Clip 1, Clip 2...)
+    user_parsed = parse_user_custom_ai_scenes(prompt)
+    if user_parsed:
+        story_data = user_parsed
+        log(f"Parsed {len(story_data['scenes'])} custom scenes directly from your prompt!")
+
+    # Priority 2: Try Gemini API if key is provided
+    if not story_data and gemini_key:
         try:
             story_data = prompt_gemini_scenes(prompt, style_key, aspect, duration, gemini_key)
-            log(f"Generated {len(story_data.get('scenes', []))} story-matched scenes!")
+            log(f"Generated {len(story_data.get('scenes', []))} story-matched scenes with Gemini AI!")
         except Exception as e:
-            log(f"Gemini API notice: {e}. Using intelligent fallback generator...")
-            
+            log(f"Gemini API notice: {e}. Trying Free AI Director...")
+
+    # Priority 3: Try Free AI Director (Zero Key Required)
+    if not story_data:
+        try:
+            story_data = generate_free_ai_scenes(prompt, style_key, aspect, duration)
+            log(f"Generated {len(story_data.get('scenes', []))} unique topic-matched scenes with Free AI Director!")
+        except Exception as e:
+            log(f"Free AI notice: {e}. Using dynamic topic fallback...")
+
+    # Priority 4: Dynamic topic fallback
     if not story_data:
         story_data = fallback_scenes(prompt, style_key, duration)
+        log(f"Generated {len(story_data.get('scenes', []))} dynamic scenes for '{story_data.get('title')}'!")
 
     scenes = story_data["scenes"]
     

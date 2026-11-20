@@ -64,7 +64,7 @@ def background_video_task(job_id: str, req: GenerateRequest):
                 log_callback=on_log
             )
         # If dynamic_ai or style is an AI dynamic style:
-        elif req.engine_mode == "dynamic_ai" or req.style in ["cinematic_3d", "photorealistic", "dark_noir", "comic_anime", "tall_tale_2d3d"]:
+        elif req.engine_mode == "dynamic_ai" or req.style in ["2d_story", "cinematic_3d", "photorealistic", "dark_noir", "comic_anime", "tall_tale_2d3d"]:
             res = run_dynamic_pipeline(
                 job_id=job_id,
                 prompt=req.prompt,

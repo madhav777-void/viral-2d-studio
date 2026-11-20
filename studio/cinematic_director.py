@@ -95,39 +95,133 @@ Rules:
     raw = data["candidates"][0]["content"]["parts"][0]["text"]
     return json.loads(raw)
 
+def generate_free_ai_cinematic_story(prompt: str, look: str = "aesthetic_grid", aspect: str = "16:9", duration: int = 45):
+    import urllib.request
+    import urllib.parse
+    import re
+    target_steps = max(3, min(15, int(duration / 10)))
+    sys_prompt = f"""You are an elite 2D motion graphics explainer director (Vox, Johnny Harris, Kurzgesagt).
+Topic: "{prompt}"
+Target Duration: ~{duration} seconds ({target_steps} steps).
+Create a rich, factual, topic-specific 2D documentary explainer storyboard.
+
+Return STRICT JSON ONLY matching this exact structure:
+{{
+  "title": "CATCHY SHORT TITLE (MAX 4 WORDS)",
+  "look": "{look}",
+  "steps": [
+    {{
+      "id": 1,
+      "spoken": "Opening hook sentence specifically about {prompt}.",
+      "card_title": "KEY STEP TITLE (2-3 WORDS)",
+      "card_lines": ["Key factual point 1", "Key factual point 2"],
+      "counter": null,
+      "stamp": "APPROVED",
+      "highlight_word": "key"
+    }}
+  ]
+}}
+Rules:
+- Generate exactly {target_steps} steps covering the true topic chronologically.
+- Never use generic placeholder text. Every point and sentence must be 100% relevant to "{prompt}".
+- If prompt contains numbers/stats, include a counter: {{"val": 10000, "prefix": "₹", "suffix": "", "caption": "LABEL"}}, otherwise set to null.
+- Set stamp to a relevant 1-word badge or null.
+"""
+    url = "https://text.pollinations.ai/" + urllib.parse.quote(sys_prompt) + "?json=true"
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=25) as resp:
+        text = resp.read().decode("utf-8")
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if match:
+            data = json.loads(match.group(0))
+            if "steps" in data and len(data["steps"]) >= 2:
+                return data
+    raise RuntimeError("Failed to parse free AI JSON")
+
+def parse_user_custom_script(prompt: str):
+    import re
+    lines = prompt.strip().split("\n")
+    clips = []
+    current_clip = {}
+    for line in lines:
+        line_s = line.strip()
+        if not line_s:
+            continue
+        clip_match = re.match(r'^(?:CLIP|Clip|SCENE|Scene|\#)\s*(\d+)|\b(\d+)\.\s+', line_s)
+        if clip_match:
+            if current_clip and "spoken" in current_clip:
+                clips.append(current_clip)
+            current_clip = {"id": len(clips) + 1, "spoken": "", "card_lines": []}
+            rest = re.sub(r'^(?:CLIP|Clip|SCENE|Scene|\#)\s*(\d+)|\b(\d+)\.\s+', '', line_s).strip(" -:–")
+            if rest:
+                current_clip["card_title"] = rest[:25].upper()
+        elif "voice-over:" in line_s.lower() or "voiceover:" in line_s.lower() or "vo:" in line_s.lower():
+            text = re.sub(r'^(?:voice-over|voiceover|vo)\s*:\s*', '', line_s, flags=re.I).strip()
+            if current_clip:
+                current_clip["spoken"] = text
+        elif "visual:" in line_s.lower() or "visuals:" in line_s.lower():
+            vis = re.sub(r'^(?:visual|visuals)\s*:\s*', '', line_s, flags=re.I).strip()
+            if current_clip:
+                current_clip["card_lines"].append(vis[:40])
+        elif current_clip:
+            if not current_clip.get("spoken"):
+                current_clip["spoken"] = line_s
+            elif len(current_clip["card_lines"]) < 2:
+                current_clip["card_lines"].append(line_s[:40])
+
+    if current_clip and "spoken" in current_clip:
+        clips.append(current_clip)
+
+    if len(clips) >= 2:
+        title = "EXPLAINER STORY"
+        first_line = lines[0].strip()
+        if len(first_line) < 40 and not first_line.lower().startswith("clip"):
+            title = first_line.upper()
+        for idx, c in enumerate(clips, 1):
+            c["id"] = idx
+            if not c.get("card_title"):
+                c["card_title"] = f"STEP {idx:02d}"
+            if not c.get("card_lines"):
+                c["card_lines"] = [c["spoken"][:35]]
+            c["counter"] = None
+            c["stamp"] = "KEY POINT"
+        return {"title": title, "steps": clips}
+    return None
+
 def fallback_cinematic_story(prompt: str):
-    words = prompt.split()
-    title = " ".join(words[:4]).upper() if words else "THE EXPLAINER"
+    words = [w for w in prompt.replace("?", "").replace("!", "").split() if len(w) > 2]
+    topic = " ".join(words[:4]).title() if words else "This Concept"
+    title = f"{topic}".upper()
     return {
         "title": title,
-        "look": "studio",
+        "look": "aesthetic_grid",
         "steps": [
             {
                 "id": 1,
-                "spoken": f"Most people believe the story of {prompt} is just a myth.",
-                "card_title": "THE DISCOVERY",
-                "card_lines": ["Unchecked fine print", "Zero restrictions"],
+                "spoken": f"Understanding {topic} begins with a simple question: what makes it work so well?",
+                "card_title": "THE FOUNDATION",
+                "card_lines": [f"Core mechanics of {words[0] if words else 'the system'}", "Underlying operational rules"],
                 "counter": None,
-                "stamp": "LOOPHOLE",
-                "highlight_word": "myth"
+                "stamp": "OVERVIEW",
+                "highlight_word": "question"
             },
             {
                 "id": 2,
-                "spoken": "When the mechanics were finally tested, the loophole went completely viral.",
-                "card_title": "THE EXPLOIT",
-                "card_lines": ["100% legal transaction", "System cleared"],
-                "counter": {"val": 1000000, "prefix": "$", "suffix": "", "caption": "TOTAL VALUE"},
-                "stamp": "APPROVED",
-                "highlight_word": "tested"
+                "spoken": f"When you look at the key mechanics driving {topic}, the real breakthrough becomes obvious.",
+                "card_title": "THE BREAKTHROUGH",
+                "card_lines": ["High-efficiency protocol", "Direct measurable outcome"],
+                "counter": {"val": 100, "prefix": "", "suffix": "%", "caption": "IMPACT"},
+                "stamp": "VERIFIED",
+                "highlight_word": "obvious"
             },
             {
                 "id": 3,
-                "spoken": "By the time officials realized the glitch, the policy was changed forever.",
-                "card_title": "THE AFTERMATH",
-                "card_lines": ["Guidelines rewritten", "Loophole permanently closed"],
+                "spoken": f"In the end, applying the right strategy around {topic} delivers lasting advantages.",
+                "card_title": "STRATEGIC TAKEAWAY",
+                "card_lines": ["Long-term value creation", "System optimized"],
                 "counter": None,
-                "stamp": "VOID",
-                "highlight_word": "forever"
+                "stamp": "COMPLETE",
+                "highlight_word": "advantages"
             }
         ]
     }
@@ -234,17 +328,35 @@ def run_2d_cinematic_pipeline(job_id: str, prompt: str, look: str = "aesthetic_g
     log(f"Starting 2D Cinematic Motion Graphics Engine for '{prompt[:45]}...'")
 
     # Step 1: AI Storyboard
-    log("Directing 2D motion graphics storyboard with Gemini AI...")
+    log("Directing 2D motion graphics storyboard...")
     story_data = None
-    if gemini_key:
+
+    # Priority 1: Check if user entered a custom structured script (e.g. Clip 1, Clip 2...)
+    user_parsed = parse_user_custom_script(prompt)
+    if user_parsed:
+        story_data = user_parsed
+        log(f"Parsed {len(story_data['steps'])} custom scenes directly from your prompt!")
+
+    # Priority 2: Use Gemini API if key is provided
+    if not story_data and gemini_key:
         try:
             story_data = prompt_gemini_cinematic_story(prompt, look, aspect, duration, gemini_key)
-            log(f"Generated {len(story_data.get('steps', []))} 2D motion graphic scenes!")
+            log(f"Generated {len(story_data.get('steps', []))} 2D motion graphic scenes with Gemini AI!")
         except Exception as e:
-            log(f"Gemini API warning: {e}. Using intelligent fallback...")
-    
+            log(f"Gemini API notice: {e}. Trying Free AI Director...")
+
+    # Priority 3: Use Free AI Director (Zero Key Required)
+    if not story_data:
+        try:
+            story_data = generate_free_ai_cinematic_story(prompt, look, aspect, duration)
+            log(f"Generated {len(story_data.get('steps', []))} topic-specific scenes with Free AI Director!")
+        except Exception as e:
+            log(f"Free AI notice: {e}. Using topic-aware generator...")
+
+    # Priority 4: Dynamic topic-aware fallback
     if not story_data:
         story_data = fallback_cinematic_story(prompt)
+        log(f"Generated {len(story_data.get('steps', []))} dynamic scenes for '{story_data.get('title')}'!")
 
     steps = story_data.get("steps", [])
     title = story_data.get("title", prompt[:30])
